@@ -1,3 +1,4 @@
+import 'package:aphasia_saviour/models/word.model.dart';
 import 'package:aphasia_saviour/resources/keys.dart';
 import 'package:aphasia_saviour/services/shared_preference.service.dart';
 import 'package:aphasia_saviour/services/text_to_speech.service.dart';
@@ -12,7 +13,7 @@ class AddTextPage extends StatefulWidget {
 class _AddTextPageState extends State<AddTextPage> {
   FlutterTts tts;
   SharedPreferencesService sharedPrefs;
-  List<String> values = [];
+  List<Word> values = [];
 
   @override
   void initState() {
@@ -25,7 +26,15 @@ class _AddTextPageState extends State<AddTextPage> {
     sharedPrefs = SharedPreferencesService();
     await sharedPrefs.initService();
     setState(() {
-      values = sharedPrefs.getStringList(id: AppKeys.wordsKey);
+      values = sharedPrefs.getStringList(id: AppKeys.wordsKey).map((e) {
+        List a = e.split(',');
+        if (a.length > 1) {
+          
+        return new Word(a[0], a[1], a[2]);
+        } else {
+          return new Word('' ,"", a[0]);
+        }
+      }).toList();
     });
   }
 
@@ -43,11 +52,13 @@ class _AddTextPageState extends State<AddTextPage> {
           actionPane: SlidableStrechActionPane(),
           actionExtentRatio: 0.25,
           child: ListTile(
-              key: Key(values[index].toString()),
-              title: Text(values[index]),
-              trailing: IconButton(
-                  icon: Icon(Icons.surround_sound),
-                  onPressed: () => tts.speak(values[index])),
+            key: Key(values[index].toString()),
+            leading: Text( values[index].lang == 'UK' ?"🇬🇧" : values[index].lang == "PL" ? "🇵🇱" : "🇩🇪"),
+            title: Text(values[index].text),
+            subtitle: Text(values[index].cat),
+            trailing: IconButton(
+                icon: Icon(Icons.surround_sound),
+                onPressed: () => tts.speak(values[index].text)),
           ),
           secondaryActions: <Widget>[
             IconSlideAction(
@@ -78,22 +89,36 @@ class _AddTextPageState extends State<AddTextPage> {
 
     print(value);
 
-    if (value is String) {
+    if (value is Word) {
       addTextToList(value);
     }
   }
 
-  void addTextToList(String word) async {
+  void addTextToList(Word word) async {
     this.values.add(word);
     setState(() {
-      sharedPrefs.setStringList(id: AppKeys.wordsKey, strings: this.values);
+      sharedPrefs.setStringList(
+        id: AppKeys.wordsKey,
+        strings: this.values.map(
+          (e) {
+            return "${e.lang},${e.cat},${e.text}";
+          },
+        ).toList(),
+      );
     });
   }
 
   void deleteWord(int index) {
     this.values.removeAt(index);
     setState(() {
-      sharedPrefs.setStringList(id: AppKeys.wordsKey, strings: this.values);
+      sharedPrefs.setStringList(
+        id: AppKeys.wordsKey,
+        strings: this.values.map(
+          (e) {
+            return "${e.lang},${e.cat},${e.text}";
+          },
+        ).toList(),
+      );
     });
   }
 }
@@ -106,11 +131,14 @@ class AddWordDiolog extends StatefulWidget {
 class _AddWordDiologState extends State<AddWordDiolog> {
   TextEditingController _textEditingController;
   TextEditingController _catTextEditingController;
+  String lang = 'PL';
+  String cat = '';
 
   @override
   void initState() {
     super.initState();
     _textEditingController = new TextEditingController();
+    _catTextEditingController = new TextEditingController();
   }
 
   @override
@@ -126,11 +154,28 @@ class _AddWordDiologState extends State<AddWordDiolog> {
       contentPadding: EdgeInsets.all(20),
       children: <Widget>[
         TextFormField(
+          decoration: InputDecoration(labelText: "Text"),
           controller: _textEditingController,
         ),
-        // TextFormField(
-        //   controller: _catTextEditingController,
-        // ),
+        TextFormField(
+          decoration: InputDecoration(labelText: "Catagory"),
+          controller: _catTextEditingController,
+        ),
+        new DropdownButton<String>(
+          hint: Text("Language"),
+          value: lang,
+          items: <String>['UK', 'DE', 'PL'].map((String value) {
+            return new DropdownMenuItem<String>(
+              value: value,
+              child: new Text(value),
+            );
+          }).toList(),
+          onChanged: (v) {
+            setState(() {
+              this.lang = v;
+            });
+          },
+        ),
         RaisedButton(
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
@@ -142,6 +187,7 @@ class _AddWordDiologState extends State<AddWordDiolog> {
   }
 
   void addWord() {
-    Navigator.of(context).pop(_textEditingController.text);
+    Navigator.of(context)
+        .pop(new Word(lang, _catTextEditingController.text ,_textEditingController.text));
   }
 }
