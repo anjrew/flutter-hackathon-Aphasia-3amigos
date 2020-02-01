@@ -14,15 +14,12 @@ class WordGame extends StatefulWidget {
 
 class _WordGameState extends State<WordGame> {
   String _selectedWord = "";
-  List<String> _array = [
-    "Hallo",
-    "Computer",
-    "Cat",
-    "Dog",
-    "Tiger",
-    "Phone",
-    "House"
-  ];
+
+  Map _words = {
+    "en-US": ["Cat", "Dog", "Tiger", "Phone", "House"],
+    "pl-PL": ["Kot", "Pies", "Tygrys", "Telefon", "Dom"],
+    "de-DE": ["Katze", "Hund", "Tiger", "Handy", "Haus"]
+  };
   var rnd = new Random();
   var count = 0;
   FlutterTts tts = FlutterTts();
@@ -39,20 +36,23 @@ class _WordGameState extends State<WordGame> {
   void didUpdateWidget(WordGame oldWidget) {
     // TODO: implement didUpdateWidget
     tts.setLanguage(widget.languageCode);
+
+    _selectedWord = _words[widget.languageCode][count];
     super.didUpdateWidget(oldWidget);
   }
 
   void _start() {
     setState(() {
-      _selectedWord = _array[count];
+      _selectedWord = _words[widget.languageCode][count];
     });
   }
 
   void _nextWord() {
     setState(() {
       count++;
-      if (count >= _array.length) count = _array.length - 1;
-      _selectedWord = _array[count];
+      var len = _words[widget.languageCode].length;
+      if (count >= len) count = len - 1;
+      _selectedWord = _words[widget.languageCode][count];
     });
   }
 
@@ -60,7 +60,7 @@ class _WordGameState extends State<WordGame> {
     setState(() {
       count--;
       if (count < 0) count = 0;
-      _selectedWord = _array[count];
+      _selectedWord = _words[widget.languageCode][count];
     });
   }
 

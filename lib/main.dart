@@ -37,7 +37,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   var language = ["🇬🇧", "🇵🇱", "🇩🇪"];
-  var languageCode = ["en-US", "pl", "de"];
+  var languageCode = ["en-US", "pl-PL", "de-DE"];
   var currentLanguage = 0;
   List<Widget> _widgetOptions;
 
