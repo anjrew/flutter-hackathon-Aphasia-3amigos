@@ -14,6 +14,8 @@ class _AddTextPageState extends State<AddTextPage> {
   FlutterTts tts;
   SharedPreferencesService sharedPrefs;
   List<Word> values = [];
+  TextEditingController editingController = TextEditingController();
+  List<Word> renderList = [];
 
   @override
   void initState() {
@@ -26,50 +28,78 @@ class _AddTextPageState extends State<AddTextPage> {
     sharedPrefs = SharedPreferencesService();
     await sharedPrefs.initService();
     setState(() {
-      values = sharedPrefs.getStringList(id: AppKeys.wordsKey).map((e) {
-        List a = e.split(',');
-        if (a.length > 1) {
-          
-        return new Word(a[0], a[1], a[2]);
-        } else {
-          return new Word('' ,"", a[0]);
-        }
-      }).toList().reversed.toList();
+      values = sharedPrefs
+          .getStringList(id: AppKeys.wordsKey)
+          .map((e) {
+            List a = e.split(',');
+            if (a.length > 1) {
+              return new Word(a[0], a[1], a[2]);
+            } else {
+              return new Word('', "", a[0]);
+            }
+          })
+          .toList()
+          .reversed
+          .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
-      ListView.separated(
-        separatorBuilder: (context, index) => Divider(
-          color: Colors.black,
-        ),
-        itemCount: values.length,
-        itemBuilder: (context, index) => Slidable(
-          key: Key(index.toString()),
-          direction: Axis.horizontal, 
-          actionPane: SlidableStrechActionPane(),
-          actionExtentRatio: 0.25,
-          child: ListTile(
-            key: Key(values[index].toString()),
-            leading: Text( values[index].lang == 'en-Us' ? "🇬🇧" : values[index].lang == "pl-PL" ? "🇵🇱" : "🇩🇪"),
-            title: Text(values[index].text),
-            subtitle: Text(values[index].cat),
-            trailing: IconButton(
-                icon: Icon(Icons.surround_sound),
-                onPressed: () {
-                  tts.setLanguage(values[index].lang);
-                  tts.speak(values[index].text);
-                  }),
-          ),
-          
-          secondaryActions: <Widget>[
-            IconSlideAction(
-              caption: 'Delete',
-              color: Colors.red,
-              icon: Icons.delete,
-              onTap: () => deleteWord(index),
+      Container(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (value) {
+                  filterSearchResults(value);
+                },
+                controller: editingController,
+                decoration: InputDecoration(
+                    labelText: "Search",
+                    hintText: "Search",
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+              ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => Divider(
+                  color: Colors.black,
+                ),
+                itemCount: renderList.length,
+                itemBuilder: (context, index) => Slidable(
+                  key: Key(index.toString()),
+                  direction: Axis.horizontal,
+                  actionPane: SlidableStrechActionPane(),
+                  actionExtentRatio: 0.25,
+                  child: ListTile(
+                    key: Key(renderList[index].toString()),
+                    leading: Text(renderList[index].lang == 'en-Us'
+                        ? "🇬🇧"
+                        : renderList[index].lang == "pl-PL" ? "🇵🇱" : "🇩🇪"),
+                    title: Text(renderList[index].text),
+                    subtitle: Text(renderList[index].cat),
+                    trailing: IconButton(
+                        icon: Icon(Icons.surround_sound),
+                        onPressed: () {
+                          tts.setLanguage(renderList[index].lang);
+                          tts.speak(renderList[index].text);
+                        }),
+                  ),
+                  secondaryActions: <Widget>[
+                    IconSlideAction(
+                      caption: 'Delete',
+                      color: Colors.red,
+                      icon: Icons.delete,
+                      onTap: () => deleteWord(index),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -81,6 +111,31 @@ class _AddTextPageState extends State<AddTextPage> {
             child: Icon(Icons.add), onPressed: () => addTextDiolog()),
       ),
     ]);
+  }
+
+   void filterSearchResults(String query) {
+    List<Word> dummySearchList = List<Word>();
+    dummySearchList.addAll(values);
+    print(query);
+    if(query != null && query != "") {
+      List<Word> dummyListData = List<Word>();
+      dummySearchList.forEach((item) {
+        if(item.cat.contains(query)) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        renderList.clear();
+        renderList.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        renderList.clear();
+        renderList.addAll(values);
+      });
+    }
+
   }
 
   void addTextDiolog() async {
@@ -99,15 +154,20 @@ class _AddTextPageState extends State<AddTextPage> {
   }
 
   void addTextToList(Word word) async {
-    this.values.insert(0,word);
+    this.values.insert(0, word);
     setState(() {
       sharedPrefs.setStringList(
         id: AppKeys.wordsKey,
-        strings: this.values.map(
-          (e) {
-            return "${e.lang},${e.cat},${e.text}";
-          },
-        ).toList().reversed.toList(),
+        strings: this
+            .values
+            .map(
+              (e) {
+                return "${e.lang},${e.cat},${e.text}";
+              },
+            )
+            .toList()
+            .reversed
+            .toList(),
       );
     });
   }
@@ -191,7 +251,7 @@ class _AddWordDiologState extends State<AddWordDiolog> {
   }
 
   void addWord() {
-    Navigator.of(context)
-        .pop(new Word(lang, _catTextEditingController.text ,_textEditingController.text));
+    Navigator.of(context).pop(new Word(
+        lang, _catTextEditingController.text, _textEditingController.text));
   }
 }
