@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:aphasia_saviour/services/BottomButton.dart';
 import 'package:aphasia_saviour/services/text_to_speech.service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class WordGame extends StatefulWidget {
   String languageCode;
@@ -14,7 +15,7 @@ class WordGame extends StatefulWidget {
 
 class _WordGameState extends State<WordGame> {
   String _selectedWord = "";
-
+  List images = ["cat.jpeg", "dog.jpg", "tiger.jpg", "phone.jpg", "house.jpg"];
   Map _words = {
     "en-US": ["Cat", "Dog", "Tiger", "Phone", "House"],
     "pl-PL": ["Kot", "Pies", "Tygrys", "Telefon", "Dom"],
@@ -75,6 +76,7 @@ class _WordGameState extends State<WordGame> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Image.asset('assets/images/' + images[count]),
               Text(
                 '$_selectedWord',
                 style: Theme.of(context).textTheme.headline4,
