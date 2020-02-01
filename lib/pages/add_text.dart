@@ -39,6 +39,7 @@ class _AddTextPageState extends State<AddTextPage> {
         itemBuilder: (context, index) => ListTile(
           key: Key(values[index].toString()),
           title: Text(values[index]),
+          trailing: IconButton(icon: Icon(Icons.surround_sound), onPressed: () => tts.speak(values[index])),
         ),
       ),
       Positioned(
@@ -105,7 +106,7 @@ class _AddWordDiologState extends State<AddWordDiolog> {
         RaisedButton(
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
-          child: Text("Add Word"),
+          child: Text("Add"),
           onPressed: addWord,
         ),
       ],
