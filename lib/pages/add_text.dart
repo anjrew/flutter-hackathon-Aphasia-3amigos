@@ -34,7 +34,7 @@ class _AddTextPageState extends State<AddTextPage> {
         } else {
           return new Word('' ,"", a[0]);
         }
-      }).toList();
+      }).toList().reversed.toList();
     });
   }
 
@@ -99,7 +99,7 @@ class _AddTextPageState extends State<AddTextPage> {
   }
 
   void addTextToList(Word word) async {
-    this.values.add(word);
+    this.values.insert(0,word);
     setState(() {
       sharedPrefs.setStringList(
         id: AppKeys.wordsKey,
@@ -107,7 +107,7 @@ class _AddTextPageState extends State<AddTextPage> {
           (e) {
             return "${e.lang},${e.cat},${e.text}";
           },
-        ).toList(),
+        ).toList().reversed.toList(),
       );
     });
   }
