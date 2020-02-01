@@ -105,6 +105,7 @@ class AddWordDiolog extends StatefulWidget {
 
 class _AddWordDiologState extends State<AddWordDiolog> {
   TextEditingController _textEditingController;
+  TextEditingController _catTextEditingController;
 
   @override
   void initState() {
@@ -127,6 +128,9 @@ class _AddWordDiologState extends State<AddWordDiolog> {
         TextFormField(
           controller: _textEditingController,
         ),
+        // TextFormField(
+        //   controller: _catTextEditingController,
+        // ),
         RaisedButton(
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
