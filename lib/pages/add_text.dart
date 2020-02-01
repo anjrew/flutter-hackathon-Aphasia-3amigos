@@ -48,17 +48,20 @@ class _AddTextPageState extends State<AddTextPage> {
         itemCount: values.length,
         itemBuilder: (context, index) => Slidable(
           key: Key(index.toString()),
-          direction: Axis.horizontal,
+          direction: Axis.horizontal, 
           actionPane: SlidableStrechActionPane(),
           actionExtentRatio: 0.25,
           child: ListTile(
             key: Key(values[index].toString()),
-            leading: Text( values[index].lang == 'UK' ?"🇬🇧" : values[index].lang == "PL" ? "🇵🇱" : "🇩🇪"),
+            leading: Text( values[index].lang == 'en-Us' ? "🇬🇧" : values[index].lang == "pl-PL" ? "🇵🇱" : "🇩🇪"),
             title: Text(values[index].text),
             subtitle: Text(values[index].cat),
             trailing: IconButton(
                 icon: Icon(Icons.surround_sound),
-                onPressed: () => tts.speak(values[index].text)),
+                onPressed: () {
+                  tts.setLanguage(values[index].lang);
+                  tts.speak(values[index].text);
+                  }),
           ),
           secondaryActions: <Widget>[
             IconSlideAction(
@@ -131,7 +134,7 @@ class AddWordDiolog extends StatefulWidget {
 class _AddWordDiologState extends State<AddWordDiolog> {
   TextEditingController _textEditingController;
   TextEditingController _catTextEditingController;
-  String lang = 'PL';
+  String lang = 'pl-PL';
   String cat = '';
 
   @override
@@ -164,7 +167,7 @@ class _AddWordDiologState extends State<AddWordDiolog> {
         new DropdownButton<String>(
           hint: Text("Language"),
           value: lang,
-          items: <String>['UK', 'DE', 'PL'].map((String value) {
+          items: <String>['en-Us', 'DE', 'pl-PL'].map((String value) {
             return new DropdownMenuItem<String>(
               value: value,
               child: new Text(value),
