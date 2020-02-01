@@ -10,8 +10,9 @@ class SharedPreferencesService {
     initService();
   }
 
-  void initService() async {
-    prefs = await SharedPreferences.getInstance();
+  Future<bool> initService() async {
+    prefs = await SharedPreferences.getInstance(); 
+    return true;
   }
 
   void setString({@required String id, @required  String string}){

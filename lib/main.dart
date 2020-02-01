@@ -1,8 +1,13 @@
 import 'package:aphasia_saviour/pages/add_text.dart';
 import 'package:aphasia_saviour/pages/word_game.page.dart';
+import 'package:aphasia_saviour/utils/locator.util.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  setupLocator();
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
