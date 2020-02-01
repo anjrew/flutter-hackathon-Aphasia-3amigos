@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Main Page UI'),
     );
   }
 }
@@ -49,12 +49,34 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _selectedWord = "";
-  List<String> _array = ["Hello", "Bye", "Ciao"];
+  List<String> _array = ["1", "2", "3", "4", "5"];
   var rnd = new Random();
+  var count = 0;
+
+  @override
+  void initState() {
+    _start();
+  }
+
+  void _start() {
+    setState(() {
+      _selectedWord = _array[count];
+    });
+  }
 
   void _nextWord() {
     setState(() {
-      _selectedWord = _array[rnd.nextInt(_array.length)];
+      count++;
+      if (count >= _array.length) count = _array.length - 1;
+      _selectedWord = _array[count];
+    });
+  }
+
+  void _previousWord() {
+    setState(() {
+      count--;
+      if (count < 0) count = 0;
+      _selectedWord = _array[count];
     });
   }
 
@@ -106,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icons.navigate_before,
             tooltip: "Back",
             onButtonPressed: () {
-              //_previousWord();
+              _previousWord();
             },
           ),
           BottomButton(
