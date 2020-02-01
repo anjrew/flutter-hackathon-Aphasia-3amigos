@@ -1,26 +1,43 @@
 import 'dart:math';
 import 'package:aphasia_saviour/services/BottomButton.dart';
+import 'package:aphasia_saviour/services/text_to_speech.service.dart';
 import 'package:flutter/material.dart';
 
 class WordGame extends StatefulWidget {
+  var languageCode;
+
+  WordGame(languageCode);
 
   @override
-  _WordGameState createState() => _WordGameState();
+  _WordGameState createState() => _WordGameState(languageCode);
 }
 
 class _WordGameState extends State<WordGame> {
-
+  var languageCode;
+  _WordGameState(this.languageCode);
 
   String _selectedWord = "";
-  List<String> _array = ["1", "2", "3", "4", "5"];
+  List<String> _array = [
+    "Hallo",
+    "Computer",
+    "Cat",
+    "Dog",
+    "Tiger",
+    "Phone",
+    "House"
+  ];
   var rnd = new Random();
   var count = 0;
+  FlutterTts tts = FlutterTts();
 
-   @override
+  @override
   void initState() {
+    tts.setLanguage("de-DE");
+    tts.setSpeechRate(0.1);
     super.initState();
     _start();
   }
+
 
   void _start() {
     setState(() {
@@ -44,6 +61,9 @@ class _WordGameState extends State<WordGame> {
     });
   }
 
+  void _playSound() {
+    tts.speak(_selectedWord);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +93,7 @@ class _WordGameState extends State<WordGame> {
           icon: Icons.play_arrow,
           tooltip: "Hear Sound",
           onButtonPressed: () {
+            _playSound();
           },
         ),
         BottomButton(

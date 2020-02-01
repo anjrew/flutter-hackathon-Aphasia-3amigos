@@ -18,7 +18,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Main Page UI'),
+      home: MyHomePage(
+        title: 'Main Page UI',
+      ),
     );
   }
 }
@@ -34,6 +36,29 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
+  var language = ["🇬🇧", "🇵🇱", "🇩🇪"];
+  var languageCode = ["en-US", "pl", "de"];
+  var currentLanguage = 0;
+  List<Widget> _widgetOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _widgetOptions = <Widget>[
+      WordGame(languageCode[currentLanguage]),
+      AddTextPage()
+    ];
+  }
+
+  void changeLanguage() {
+    setState(() {
+      currentLanguage++;
+      if (currentLanguage == language.length) {
+        currentLanguage = 0;
+      }
+    });
+    print("Main: " + languageCode[currentLanguage]);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -41,14 +66,28 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  List<Widget> _widgetOptions = <Widget>[WordGame(), AddTextPage()];
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
+          actions: <Widget>[
+            new InkWell(
+              onTap: () {
+                changeLanguage();
+              },
+              child: new Padding(
+                padding: new EdgeInsets.all(8.0),
+                child: new Text(
+                  language[currentLanguage],
+                  style: new TextStyle(
+                    fontSize: 35.0,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
         body: _widgetOptions.elementAt(_selectedIndex),
         bottomNavigationBar: BottomNavigationBar(

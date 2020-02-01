@@ -10,12 +10,15 @@ class BottomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: this.alignment,
-      child: FloatingActionButton(
-        onPressed: this.onButtonPressed,
-        tooltip: this.tooltip,
-        child: Icon(this.icon),
+    return Container(
+      margin: EdgeInsets.all(10),
+      child: Align(
+        alignment: this.alignment,
+        child: FloatingActionButton(
+          onPressed: this.onButtonPressed,
+          tooltip: this.tooltip,
+          child: Icon(this.icon),
+        ),
       ),
     );
   }
