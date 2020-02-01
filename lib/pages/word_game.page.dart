@@ -36,7 +36,6 @@ class _WordGameState extends State<WordGame> {
   void didUpdateWidget(WordGame oldWidget) {
     // TODO: implement didUpdateWidget
     tts.setLanguage(widget.languageCode);
-
     _selectedWord = _words[widget.languageCode][count];
     super.didUpdateWidget(oldWidget);
   }

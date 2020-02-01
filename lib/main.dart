@@ -38,25 +38,19 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   var language = ["🇬🇧", "🇵🇱", "🇩🇪"];
   var languageCode = ["en-US", "pl-PL", "de-DE"];
+
+  Map languages = {"🇬🇧": "en-US", "🇵🇱": "pl-PL", "🇩🇪": "de-DE"};
   var currentLanguage = 0;
   List<Widget> _widgetOptions;
+  var dropdownValue = "🇬🇧";
 
   @override
   void initState() {
     super.initState();
     _widgetOptions = <Widget>[
-      WordGame(languageCode[currentLanguage]),
+      WordGame(languages[dropdownValue]),
       AddTextPage()
     ];
-  }
-
-  void changeLanguage() {
-    setState(() {
-      currentLanguage++;
-      if (currentLanguage == language.length) {
-        currentLanguage = 0;
-      }
-    });
   }
 
   void _onItemTapped(int index) {
@@ -72,23 +66,26 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
           actions: <Widget>[
-            new InkWell(
-              onTap: () {
-                changeLanguage();
+            DropdownButton<String>(
+              value: dropdownValue,
+              onChanged: (String newValue) {
+                setState(() {
+                  dropdownValue = newValue;
+                });
               },
-              child: new Padding(
-                padding: new EdgeInsets.all(8.0),
-                child: new Text(
-                  language[currentLanguage],
-                  style: new TextStyle(
-                    fontSize: 35.0,
-                  ),
-                ),
-              ),
+              items: <String>["🇬🇧", "🇵🇱", "🇩🇪"]
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value,
+                      style: TextStyle(fontSize: 25.0),
+                      textAlign: TextAlign.center),
+                );
+              }).toList(),
             ),
           ],
         ),
-        body: <Widget>[WordGame(languageCode[currentLanguage]), AddTextPage()]
+        body: <Widget>[WordGame(languages[dropdownValue]), AddTextPage()]
             .elementAt(_selectedIndex),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
