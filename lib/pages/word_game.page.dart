@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:aphasia_saviour/services/BottomButton.dart';
 import 'package:aphasia_saviour/services/text_to_speech.service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class WordGame extends StatefulWidget {
   String languageCode;
