@@ -57,7 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
         currentLanguage = 0;
       }
     });
-    print("Main: " + languageCode[currentLanguage]);
   }
 
   void _onItemTapped(int index) {
@@ -89,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-        body: _widgetOptions.elementAt(_selectedIndex),
+        body: <Widget>[WordGame(languageCode[currentLanguage]), AddTextPage()]
+            .elementAt(_selectedIndex),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(

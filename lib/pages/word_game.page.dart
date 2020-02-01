@@ -4,18 +4,15 @@ import 'package:aphasia_saviour/services/text_to_speech.service.dart';
 import 'package:flutter/material.dart';
 
 class WordGame extends StatefulWidget {
-  var languageCode;
+  String languageCode;
 
-  WordGame(languageCode);
+  WordGame(String languageCode) : this.languageCode = languageCode;
 
   @override
-  _WordGameState createState() => _WordGameState(languageCode);
+  _WordGameState createState() => _WordGameState();
 }
 
 class _WordGameState extends State<WordGame> {
-  var languageCode;
-  _WordGameState(this.languageCode);
-
   String _selectedWord = "";
   List<String> _array = [
     "Hallo",
@@ -32,12 +29,18 @@ class _WordGameState extends State<WordGame> {
 
   @override
   void initState() {
-    tts.setLanguage("de-DE");
+    tts.setLanguage(widget.languageCode);
     tts.setSpeechRate(0.1);
     super.initState();
     _start();
   }
 
+  @override
+  void didUpdateWidget(WordGame oldWidget) {
+    // TODO: implement didUpdateWidget
+    tts.setLanguage(widget.languageCode);
+    super.didUpdateWidget(oldWidget);
+  }
 
   void _start() {
     setState(() {
