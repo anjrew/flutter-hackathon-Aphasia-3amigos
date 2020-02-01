@@ -63,6 +63,7 @@ class _AddTextPageState extends State<AddTextPage> {
                   tts.speak(values[index].text);
                   }),
           ),
+          
           secondaryActions: <Widget>[
             IconSlideAction(
               caption: 'Delete',
