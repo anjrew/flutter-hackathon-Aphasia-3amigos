@@ -42,6 +42,7 @@ class _AddTextPageState extends State<AddTextPage> {
           .reversed
           .toList();
     });
+    filterSearchResults('');
   }
 
   @override
@@ -114,13 +115,14 @@ class _AddTextPageState extends State<AddTextPage> {
   }
 
    void filterSearchResults(String query) {
+     print('In here');
     List<Word> dummySearchList = List<Word>();
     dummySearchList.addAll(values);
     print(query);
     if(query != null && query != "") {
       List<Word> dummyListData = List<Word>();
       dummySearchList.forEach((item) {
-        if(item.cat.contains(query)) {
+        if(item.cat.toLowerCase().contains(query.toLowerCase())) {
           dummyListData.add(item);
         }
       });
