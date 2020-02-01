@@ -14,7 +14,7 @@ class WordGame extends StatefulWidget {
 
 class _WordGameState extends State<WordGame> {
   String _selectedWord = "";
-
+  List images = ["cat.jpeg", "dog.jpg", "tiger.jpg", "phone.jpg", "house.jpg"];
   Map _words = {
     "en-US": ["Cat", "Dog", "Tiger", "Phone", "House"],
     "pl-PL": ["Kot", "Pies", "Tygrys", "Telefon", "Dom"],
@@ -75,6 +75,7 @@ class _WordGameState extends State<WordGame> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Image.asset('assets/images/' + images[count]),
               Text(
                 '$_selectedWord',
                 style: Theme.of(context).textTheme.headline4,
