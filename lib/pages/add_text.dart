@@ -172,6 +172,7 @@ class _AddTextPageState extends State<AddTextPage> {
             .toList(),
       );
     });
+    filterSearchResults(editingController.text);
   }
 
   void deleteWord(int index) {
