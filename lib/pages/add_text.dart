@@ -1,5 +1,7 @@
+import 'package:aphasia_saviour/models/country_data.model.dart';
 import 'package:aphasia_saviour/models/word.model.dart';
-import 'package:aphasia_saviour/resources/keys.dart';
+import 'package:aphasia_saviour/resources/countrys.values.dart';
+import 'package:aphasia_saviour/resources/keys.values.dart';
 import 'package:aphasia_saviour/services/shared_preference.service.dart';
 import 'package:aphasia_saviour/services/text_to_speech.service.dart';
 import 'package:flutter/material.dart';
@@ -54,13 +56,11 @@ class _AddTextPageState extends State<AddTextPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                onChanged: (value) {
-                  filterSearchResults(value);
-                },
+                onChanged: filterSearchResults,
                 controller: editingController,
                 decoration: InputDecoration(
                     labelText: "Search",
-                    hintText: "Search",
+                    hintText: "Search for a catagory",
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(25.0)))),
@@ -79,15 +79,13 @@ class _AddTextPageState extends State<AddTextPage> {
                   actionExtentRatio: 0.25,
                   child: ListTile(
                     key: Key(renderList[index].toString()),
-                    leading: Text(renderList[index].lang == 'en-Us'
-                        ? "🇬🇧"
-                        : renderList[index].lang == "pl-PL" ? "🇵🇱" : "🇩🇪"),
+                    leading: Text(renderList[index].country.flagUtf),
                     title: Text(renderList[index].text),
                     subtitle: Text(renderList[index].cat),
                     trailing: IconButton(
                         icon: Icon(Icons.surround_sound),
                         onPressed: () {
-                          tts.setLanguage(renderList[index].lang);
+                          tts.setLanguage(renderList[index].country.code);
                           tts.speak(renderList[index].text);
                         }),
                   ),
@@ -114,15 +112,14 @@ class _AddTextPageState extends State<AddTextPage> {
     ]);
   }
 
-   void filterSearchResults(String query) {
-     print('In here');
+  void filterSearchResults(String query) {
     List<Word> dummySearchList = List<Word>();
     dummySearchList.addAll(values);
     print(query);
-    if(query != null && query != "") {
+    if (query != null && query != "") {
       List<Word> dummyListData = List<Word>();
       dummySearchList.forEach((item) {
-        if(item.cat.toLowerCase().contains(query.toLowerCase())) {
+        if (item.cat.toLowerCase().contains(query.toLowerCase())) {
           dummyListData.add(item);
         }
       });
@@ -137,7 +134,6 @@ class _AddTextPageState extends State<AddTextPage> {
         renderList.addAll(values);
       });
     }
-
   }
 
   void addTextDiolog() async {
@@ -148,7 +144,6 @@ class _AddTextPageState extends State<AddTextPage> {
       },
     );
 
-    print(value);
 
     if (value is Word) {
       addTextToList(value);
@@ -164,7 +159,7 @@ class _AddTextPageState extends State<AddTextPage> {
             .values
             .map(
               (e) {
-                return "${e.lang},${e.cat},${e.text}";
+                return "${e.country},${e.cat},${e.text}";
               },
             )
             .toList()
@@ -182,7 +177,7 @@ class _AddTextPageState extends State<AddTextPage> {
         id: AppKeys.wordsKey,
         strings: this.values.map(
           (e) {
-            return "${e.lang},${e.cat},${e.text}";
+            return "${e.country},${e.cat},${e.text}";
           },
         ).toList(),
       );
@@ -190,6 +185,7 @@ class _AddTextPageState extends State<AddTextPage> {
     filterSearchResults(editingController.text);
   }
 }
+
 
 class AddWordDiolog extends StatefulWidget {
   @override
@@ -199,7 +195,7 @@ class AddWordDiolog extends StatefulWidget {
 class _AddWordDiologState extends State<AddWordDiolog> {
   TextEditingController _textEditingController;
   TextEditingController _catTextEditingController;
-  String lang = 'pl-PL';
+  CountryData country;
   String cat = '';
 
   @override
@@ -229,18 +225,18 @@ class _AddWordDiologState extends State<AddWordDiolog> {
           decoration: InputDecoration(labelText: "Catagory"),
           controller: _catTextEditingController,
         ),
-        new DropdownButton<String>(
+        new DropdownButton<CountryData>(
           hint: Text("Language"),
-          value: lang,
-          items: <String>['en-Us', 'DE', 'pl-PL'].map((String value) {
-            return new DropdownMenuItem<String>(
+          value: country ?? english,
+          items: countrys.map((CountryData value) {
+            return new DropdownMenuItem<CountryData>(
               value: value,
-              child: new Text(value),
+              child: new Text(value.flagUtf),
             );
           }).toList(),
           onChanged: (v) {
             setState(() {
-              this.lang = v;
+              this.country = v;
             });
           },
         ),
@@ -256,6 +252,8 @@ class _AddWordDiologState extends State<AddWordDiolog> {
 
   void addWord() {
     Navigator.of(context).pop(new Word(
-        lang, _catTextEditingController.text, _textEditingController.text));
+        country: country,
+        cat: _catTextEditingController.text,
+        text: _textEditingController.text));
   }
 }

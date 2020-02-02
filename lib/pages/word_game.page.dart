@@ -34,7 +34,6 @@ class _WordGameState extends State<WordGame> {
 
   @override
   void didUpdateWidget(WordGame oldWidget) {
-    // TODO: implement didUpdateWidget
     tts.setLanguage(widget.languageCode);
     _selectedWord = _words[widget.languageCode][count];
     super.didUpdateWidget(oldWidget);
@@ -87,25 +86,19 @@ class _WordGameState extends State<WordGame> {
           alignment: Alignment.bottomLeft,
           icon: Icons.navigate_before,
           tooltip: "Back",
-          onButtonPressed: () {
-            _previousWord();
-          },
+          onButtonPressed: _previousWord,
         ),
         BottomButton(
           alignment: Alignment.bottomCenter,
           icon: Icons.play_arrow,
           tooltip: "Hear Sound",
-          onButtonPressed: () {
-            _playSound();
-          },
+          onButtonPressed: _playSound,
         ),
         BottomButton(
           alignment: Alignment.bottomRight,
           icon: Icons.navigate_next,
           tooltip: "Next",
-          onButtonPressed: () {
-            _nextWord();
-          },
+          onButtonPressed: _nextWord,
         ),
       ],
     );
