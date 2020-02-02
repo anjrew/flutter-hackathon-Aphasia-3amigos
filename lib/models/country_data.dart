@@ -1,0 +1,4 @@
+class CountryData {
+  String name;
+	
+}
