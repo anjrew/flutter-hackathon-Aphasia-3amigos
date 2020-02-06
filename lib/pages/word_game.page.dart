@@ -1,19 +1,21 @@
 import 'dart:math';
-import 'package:aphasia_saviour/services/BottomButton.dart';
+import 'package:aphasia_saviour/models/country_data.model.dart';
+import 'package:aphasia_saviour/resources/countrys.values.dart';
 import 'package:aphasia_saviour/services/text_to_speech.service.dart';
+import 'package:aphasia_saviour/utils/locator.util.dart';
+import 'package:aphasia_saviour/widgets/bottom_button.widget.dart';
 import 'package:flutter/material.dart';
 
 class WordGame extends StatefulWidget {
-  String languageCode;
-
-  WordGame(String languageCode) : this.languageCode = languageCode;
-
   @override
   _WordGameState createState() => _WordGameState();
 }
 
 class _WordGameState extends State<WordGame> {
+  TextToSpeechService tts = serviceLocator.get<TextToSpeechService>();
+
   String _selectedWord = "";
+  CountryData _dropDownValue = countrys[0];
   List images = ["cat.jpeg", "dog.jpg", "tiger.jpg", "phone.jpg", "house.jpg"];
   Map _words = {
     "en-US": ["Cat", "Dog", "Tiger", "Phone", "House"],
@@ -22,35 +24,30 @@ class _WordGameState extends State<WordGame> {
   };
   var rnd = new Random();
   var count = 0;
-  FlutterTts tts = FlutterTts();
+
+  String languageCode;
 
   @override
   void initState() {
-    tts.setLanguage(widget.languageCode);
-    tts.setSpeechRate(0.1);
     super.initState();
+    languageCode ??= "en-US";
+    tts.setLanguage(languageCode);
+    tts.setSpeechRate(0.2);
     _start();
-  }
-
-  @override
-  void didUpdateWidget(WordGame oldWidget) {
-    tts.setLanguage(widget.languageCode);
-    _selectedWord = _words[widget.languageCode][count];
-    super.didUpdateWidget(oldWidget);
   }
 
   void _start() {
     setState(() {
-      _selectedWord = _words[widget.languageCode][count];
+      _selectedWord = _words[languageCode][count];
     });
   }
 
   void _nextWord() {
     setState(() {
       count++;
-      var len = _words[widget.languageCode].length;
+      var len = _words[languageCode].length;
       if (count >= len) count = len - 1;
-      _selectedWord = _words[widget.languageCode][count];
+      _selectedWord = _words[languageCode][count];
     });
   }
 
@@ -58,7 +55,7 @@ class _WordGameState extends State<WordGame> {
     setState(() {
       count--;
       if (count < 0) count = 0;
-      _selectedWord = _words[widget.languageCode][count];
+      _selectedWord = _words[languageCode][count];
     });
   }
 
@@ -71,15 +68,37 @@ class _WordGameState extends State<WordGame> {
     return Stack(
       children: <Widget>[
         Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Image.asset('assets/images/' + images[count]),
-              Text(
-                '$_selectedWord',
-                style: Theme.of(context).textTheme.headline4,
-              ),
-            ],
+          child: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                DropdownButton<CountryData>(
+                  value: _dropDownValue,
+                  onChanged: (CountryData newValue) {
+                    setState(() {
+                      _dropDownValue = newValue;
+                    });
+                  },
+                  items: countrys.map<DropdownMenuItem<CountryData>>(
+                      (CountryData country) {
+                    return DropdownMenuItem<CountryData>(
+                      value: country,
+                      child: Text(country.flagUtf ?? 'ERROR',
+                          style: TextStyle(fontSize: 25.0),
+                          textAlign: TextAlign.center),
+                    );
+                  }).toList(),
+                ),
+                Image.asset(
+                  'assets/images/' + images[count],
+                  height: MediaQuery.of(context).size.height * 0.40,
+                ),
+                Text(
+                  _selectedWord ?? 'ERROR',
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+              ],
+            ),
           ),
         ),
         BottomButton(

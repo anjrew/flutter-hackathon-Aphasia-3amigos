@@ -1,18 +1,19 @@
+import 'package:aphasia_saviour/models/word.model.dart';
 import 'package:aphasia_saviour/resources/keys.values.dart';
-import 'package:aphasia_saviour/services/shared_preference.service.dart';
 import 'package:aphasia_saviour/services/text_to_speech.service.dart';
+import 'package:aphasia_saviour/services/words.service.dart';
+import 'package:aphasia_saviour/utils/locator.util.dart';
 import 'package:flutter/material.dart';
 
 class CatagoriesPage extends StatefulWidget {
-	@override
-	_CatagoriesPageState createState() => _CatagoriesPageState();
+  @override
+  _CatagoriesPageState createState() => _CatagoriesPageState();
 }
 
 class _CatagoriesPageState extends State<CatagoriesPage> {
-
-	FlutterTts tts;
-  SharedPreferencesService sharedPrefs;
-  List<String> values = [];
+  TextToSpeechService tts = serviceLocator.get<TextToSpeechService>();
+  List<Word> values = [];
+  WordsService wordsService = serviceLocator.get<WordsService>();
 
   @override
   void initState() {
@@ -21,19 +22,14 @@ class _CatagoriesPageState extends State<CatagoriesPage> {
   }
 
   Future<void> asyncInit() async {
-    tts = FlutterTts();
-    sharedPrefs = SharedPreferencesService();
-    await sharedPrefs.initService();
-    setState(() {
-      values = sharedPrefs.getStringList(id: AppKeys.wordsKey);
+    tts = TextToSpeechService();
+    setState(() async {
+      values = await wordsService.getWords();
     });
   }
 
-
-	@override
-	Widget build(BuildContext context) {
-		return Container(
-			
-		);
-	}
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
 }

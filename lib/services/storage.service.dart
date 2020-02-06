@@ -1,0 +1,4 @@
+class StorageService {
+  void delete() {}
+
+}

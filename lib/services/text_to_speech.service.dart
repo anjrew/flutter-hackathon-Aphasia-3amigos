@@ -6,14 +6,14 @@ import 'package:flutter/services.dart';
 typedef void ErrorHandler(dynamic message);
 
 // Provides Platform specific TTS services (Android: TextToSpeech, IOS: AVSpeechSynthesizer)
-class FlutterTts {
+class TextToSpeechService {
   static const MethodChannel _channel = const MethodChannel('flutter_tts');
 
   VoidCallback startHandler;
   VoidCallback completionHandler;
   ErrorHandler errorHandler;
 
-  FlutterTts() {
+  TextToSpeechService() {
     _channel.setMethodCallHandler(platformCallHandler);
   }
 

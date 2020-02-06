@@ -4,6 +4,8 @@ import 'package:aphasia_saviour/resources/countrys.values.dart';
 import 'package:aphasia_saviour/resources/keys.values.dart';
 import 'package:aphasia_saviour/services/shared_preference.service.dart';
 import 'package:aphasia_saviour/services/text_to_speech.service.dart';
+import 'package:aphasia_saviour/services/words.service.dart';
+import 'package:aphasia_saviour/utils/locator.util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -13,11 +15,11 @@ class AddTextPage extends StatefulWidget {
 }
 
 class _AddTextPageState extends State<AddTextPage> {
-  FlutterTts tts;
-  SharedPreferencesService sharedPrefs;
-  List<Word> values = [];
   TextEditingController editingController = TextEditingController();
-  List<Word> renderList = [];
+  TextToSpeechService ttsService = serviceLocator.get<TextToSpeechService>();
+  WordsService wordService = serviceLocator.get<WordsService>();
+  List<Word> savedWords = [];
+  List<Word> filteredWords = [];
 
   @override
   void initState() {
@@ -26,24 +28,7 @@ class _AddTextPageState extends State<AddTextPage> {
   }
 
   Future<void> asyncInit() async {
-    tts = FlutterTts();
-    sharedPrefs = SharedPreferencesService();
-    await sharedPrefs.initService();
-    setState(() {
-      values = sharedPrefs
-          .getStringList(id: AppKeys.wordsKey)
-          .map((e) {
-            List a = e.split(',');
-            if (a.length > 1) {
-              return new Word(a[0], a[1], a[2]);
-            } else {
-              return new Word('', "", a[0]);
-            }
-          })
-          .toList()
-          .reversed
-          .toList();
-    });
+    savedWords = await wordService.getWords() ?? [] ;
     filterSearchResults('');
   }
 
@@ -71,22 +56,23 @@ class _AddTextPageState extends State<AddTextPage> {
                 separatorBuilder: (context, index) => Divider(
                   color: Colors.black,
                 ),
-                itemCount: renderList.length,
+                itemCount: filteredWords.length,
                 itemBuilder: (context, index) => Slidable(
                   key: Key(index.toString()),
                   direction: Axis.horizontal,
                   actionPane: SlidableStrechActionPane(),
                   actionExtentRatio: 0.25,
                   child: ListTile(
-                    key: Key(renderList[index].toString()),
-                    leading: Text(renderList[index].country.flagUtf),
-                    title: Text(renderList[index].text),
-                    subtitle: Text(renderList[index].cat),
+                    key: Key(filteredWords[index].toString()),
+                    leading: Text(filteredWords[index].country.flagUtf),
+                    title: Text(filteredWords[index].text),
+                    subtitle: Text(filteredWords[index].catagory),
                     trailing: IconButton(
                         icon: Icon(Icons.surround_sound),
                         onPressed: () {
-                          tts.setLanguage(renderList[index].country.code);
-                          tts.speak(renderList[index].text);
+                          ttsService
+                              .setLanguage(filteredWords[index].country.code);
+                          ttsService.speak(filteredWords[index].text);
                         }),
                   ),
                   secondaryActions: <Widget>[
@@ -94,7 +80,7 @@ class _AddTextPageState extends State<AddTextPage> {
                       caption: 'Delete',
                       color: Colors.red,
                       icon: Icons.delete,
-                      onTap: () => deleteWord(index),
+                      onTap: () => deleteWord(filteredWords[index]),
                     ),
                   ],
                 ),
@@ -114,24 +100,24 @@ class _AddTextPageState extends State<AddTextPage> {
 
   void filterSearchResults(String query) {
     List<Word> dummySearchList = List<Word>();
-    dummySearchList.addAll(values);
+    dummySearchList.addAll(savedWords);
     print(query);
     if (query != null && query != "") {
       List<Word> dummyListData = List<Word>();
       dummySearchList.forEach((item) {
-        if (item.cat.toLowerCase().contains(query.toLowerCase())) {
+        if (item.catagory.toLowerCase().contains(query.toLowerCase())) {
           dummyListData.add(item);
         }
       });
       setState(() {
-        renderList.clear();
-        renderList.addAll(dummyListData);
+        filteredWords.clear();
+        filteredWords.addAll(dummyListData);
       });
       return;
     } else {
       setState(() {
-        renderList.clear();
-        renderList.addAll(values);
+        filteredWords.clear();
+        filteredWords.addAll(savedWords);
       });
     }
   }
@@ -144,48 +130,25 @@ class _AddTextPageState extends State<AddTextPage> {
       },
     );
 
-
     if (value is Word) {
       addTextToList(value);
     }
   }
 
   void addTextToList(Word word) async {
-    this.values.insert(0, word);
-    setState(() {
-      sharedPrefs.setStringList(
-        id: AppKeys.wordsKey,
-        strings: this
-            .values
-            .map(
-              (e) {
-                return "${e.country},${e.cat},${e.text}";
-              },
-            )
-            .toList()
-            .reversed
-            .toList(),
-      );
-    });
+      savedWords.insert(0, word);
+      wordService.saveWord(word);
     filterSearchResults(editingController.text);
   }
 
-  void deleteWord(int index) {
-    this.values.removeAt(index);
-    setState(() {
-      sharedPrefs.setStringList(
-        id: AppKeys.wordsKey,
-        strings: this.values.map(
-          (e) {
-            return "${e.country},${e.cat},${e.text}";
-          },
-        ).toList(),
-      );
-    });
+  void deleteWord(Word wordToDelete) {
+    wordService.deleteWord(wordToDelete);
+    setState(() => this
+        .savedWords
+        .removeWhere((Word word) => word.hashCode == wordToDelete.hashCode));
     filterSearchResults(editingController.text);
   }
 }
-
 
 class AddWordDiolog extends StatefulWidget {
   @override
@@ -253,7 +216,7 @@ class _AddWordDiologState extends State<AddWordDiolog> {
   void addWord() {
     Navigator.of(context).pop(new Word(
         country: country,
-        cat: _catTextEditingController.text,
+        catagory: _catTextEditingController.text,
         text: _textEditingController.text));
   }
 }
